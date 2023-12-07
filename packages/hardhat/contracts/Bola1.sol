@@ -12,6 +12,7 @@ contract Bola1 is Ownable {
 		uint256 numberOfVotes;
 	}
 
+	bool public _bola1Ended;
 	uint256 public _entranceFee;
 	mapping(address => uint256) public _balances;
 	mapping(address => Participant) public _participants;
@@ -26,6 +27,7 @@ contract Bola1 is Ownable {
 	}
 
 	function addParticipant(address addr, string memory name) public onlyOwner {
+		require(!_bola1Ended, "Bola1 is ended");
 		require(bytes(name).length > 0, "Name is required");
 		require(addr != address(0), "Invalid participant address");
 
@@ -34,6 +36,7 @@ contract Bola1 is Ownable {
 	}
 
 	function addVote(address addr) public payable {
+		require(!_bola1Ended, "Bola1 is ended");
 		require(msg.value >= _entranceFee, "Insufficient entrance fee");
 		require(addr != address(0), "Invalid participant address");
 		require(
@@ -62,6 +65,7 @@ contract Bola1 is Ownable {
 	}
 
 	function endOfBola1(address winner) public {
+		require(!_bola1Ended, "Bola1 is ended");
 		require(
 			bytes(_participants[winner].name).length != 0,
 			"Participant not found"
@@ -73,6 +77,8 @@ contract Bola1 is Ownable {
 			address recipient = _participants[winner].votes[i];
 			_balances[recipient] += individualPrize;
 		}
+
+		_bola1Ended = true;
 	}
 
 	/**
